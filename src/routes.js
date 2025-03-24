@@ -1,3 +1,8 @@
+import dayjs from "dayjs"
+
+
+
+const tasks = []
 export const routes = [
 
     {
@@ -5,7 +10,7 @@ export const routes = [
         path: "/tasks",
         handler: (req, res) => {
 
-            return res.writeHeader(200).end("Ok")
+            return res.writeHeader(200).end(JSON.stringify(tasks))
         }
     },
 
@@ -15,6 +20,20 @@ export const routes = [
         handler: (req, res) => {
 
             console.log(req.body)
+
+            const {title, description} = req.body
+
+            const task = {
+
+                id: 1,
+                title,
+                description,
+                completed_at: null,
+                created_at: dayjs().format(),
+                update_at: dayjs().format(),
+            }
+
+            tasks.push(task)
 
             return res.writeHeader(201).end()
         }
