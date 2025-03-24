@@ -1,13 +1,15 @@
 import dayjs from "dayjs"
+import { Database } from "./database.js"
+import {randomUUID} from "node:crypto"
+import {buildRouthPath} from "../utils/build-route_path.js"
 
-
-
+const database = new Database()
 const tasks = []
 export const routes = [
 
     {
         method: "GET",
-        path: "/tasks",
+        path: buildRouthPath("/tasks"),
         handler: (req, res) => {
 
             return res.writeHeader(200).end(JSON.stringify(tasks))
@@ -16,7 +18,7 @@ export const routes = [
 
     {
         method: "POST",
-        path: "/tasks",
+        path: buildRouthPath("/tasks"),
         handler: (req, res) => {
 
             console.log(req.body)
@@ -25,7 +27,7 @@ export const routes = [
 
             const task = {
 
-                id: 1,
+                id: randomUUID(),
                 title,
                 description,
                 completed_at: null,
@@ -66,7 +68,7 @@ export const routes = [
         path:"/tasks/:id",
         handler: (req, res) => {
 
-            console.log(req.body)
+            console.log(req.id)
 
             return res.writeHead(204).end("Ok")
         }
