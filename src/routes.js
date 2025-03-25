@@ -4,13 +4,21 @@ import {randomUUID} from "node:crypto"
 import {buildRouthPath} from "../utils/build-route_path.js"
 
 const database = new Database()
-const tasks = []
+
 export const routes = [
 
     {
         method: "GET",
         path: buildRouthPath("/tasks"),
         handler: (req, res) => {
+
+            const {search} = req.query
+
+            const tasks = database.select("tasks", search ? {
+
+                title: search,
+                description: search,
+            } : null)
 
             return res.writeHeader(200).end(JSON.stringify(tasks))
         }
@@ -32,10 +40,11 @@ export const routes = [
                 description,
                 completed_at: null,
                 created_at: dayjs().format(),
-                update_at: dayjs().format(),
+                updated_at: dayjs().format(),
             }
 
-            tasks.push(task)
+          
+            database.insert("tasks", task)
 
             return res.writeHeader(201).end()
         }
@@ -43,34 +52,69 @@ export const routes = [
 
     {
         method: "PUT",
-        path:"/tasks/:id",
+        path:buildRouthPath("/tasks/:id"),
         handler: (req, res) => {
 
-            console.log(req.body)
+           const {id} = req.params
+           const {title, description} = req.body
 
-            return res.writeHead(204).end("Ok")
+           const result = database.update("tasks", id, {
+
+                title,
+                description,
+                updated_at: dayjs().format(),
+           })
+
+           if(result) {
+
+            return res.writeHead(200).end("Tarefa atualizada")
+           }else{
+            return res.writeHead(400).end("Id Inválido")
+           }
+
+            
         }
     },
 
     {
         method: "PATCH",
-        path:"/tasks/:id/complete",
+        path:buildRouthPath("/tasks/:id/complete"),
         handler: (req, res) => {
 
-            console.log(req.body)
+            const {id} = req.params
+            
+ 
+            const result = database.update("tasks", id, {
+ 
+             completed_at: "Complete"
+            })
+ 
+            if(result) {
+ 
+             return res.writeHead(200).end("Tarefa Concluída")
+            }else{
+             return res.writeHead(400).end("Id Inválido")
+            }
 
-            return res.writeHead(204).end("Ok")
+           
         }
     },
 
     {
         method: "DELETE",
-        path:"/tasks/:id",
+        path: buildRouthPath("/tasks/:id"),
         handler: (req, res) => {
 
-            console.log(req.id)
+            const {id} = req.params
+           if(database.delete("tasks", id)){
 
-            return res.writeHead(204).end("Ok")
+            return res.writeHead(201).end("Tarefa deletada")
+           }else{
+
+            return res.writeHead(400).end("Id Inválido")
+           }
+
+            
         }
     },
 

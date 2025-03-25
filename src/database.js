@@ -8,7 +8,7 @@ export class Database{
 
     constructor(){
        
-        fs.readFile(databasePath, "urf8").then(data => {
+        fs.readFile(databasePath, "utf8").then(data => {
 
             this.#database = JSON.parse(data)
 
@@ -27,7 +27,15 @@ export class Database{
 
         let data = this.#database[table] ?? []
 
-        if(search){}
+        if(search){
+
+            data = data.filter(row => {
+                return Object.entries(search).some(([key, value]) => {
+
+                    return row[key].toLowerCase().includes(value.toLowerCase())
+                })
+            })
+        }
 
         return data
 
@@ -53,20 +61,43 @@ export class Database{
 
         if(rowIndex > -1) {
 
-            this.#database[table][rowIndex] = {id, ...data}
+            if(!data.completed_at){
+
+                console.log("Não")
+                const {completed_at, created_at} = this.#database[table][rowIndex]
+                this.#database[table][rowIndex] = {id, ...data, completed_at, created_at}
+            }else{
+
+                console.log("Sim")
+
+                const {title, description, created_at, updated_at} = this.#database[table][rowIndex]
+                this.#database[table][rowIndex] = {id, title, description, ...data, created_at, updated_at}
+            }
+
+            
             this.#persist()
+        
+            return 1
+        }else{
+
+            return 0
         }
 
     }
 
     delete(table, id) {
 
-        const rowIndex = this.#database[table].findIndex(row => row.id = id)
+        const rowIndex = this.#database[table].findIndex(row => row.id === id)
 
         if(rowIndex > -1) {
 
             this.#database[table].splice(rowIndex, 1)
             this.#persist()
+
+            return 1
+        }else {
+
+            return 0
         }
 
     }
