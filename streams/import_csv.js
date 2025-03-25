@@ -22,7 +22,7 @@ async function run(){
 
        const [title, description] = line
 
-       await fetch("http:localhost:3334/tasks", {
+       await fetch("http://localhost:3334/tasks", {
 
             method:"POST",
             headers: {
