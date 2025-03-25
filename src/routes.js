@@ -29,24 +29,44 @@ export const routes = [
         path: buildRouthPath("/tasks"),
         handler: (req, res) => {
 
-            console.log(req.body)
+            try {
 
-            const {title, description} = req.body
+                console.log(req.body)
+                const {title, description} = req.body
+    
+                if(!title) {
+    
+                    return res.writeHead(400).end("Title null")
+                }
+    
+                if(!description){
+    
+                    return res.writeHead(400).end("Description null")
+    
+                }
+    
+                const task = {
+    
+                    id: randomUUID(),
+                    title,
+                    description,
+                    completed_at: null,
+                    created_at: dayjs().format(),
+                    updated_at: dayjs().format(),
+                }
+    
+              
+                database.insert("tasks", task)
+    
+                return res.writeHeader(201).end()
 
-            const task = {
 
-                id: randomUUID(),
-                title,
-                description,
-                completed_at: null,
-                created_at: dayjs().format(),
-                updated_at: dayjs().format(),
+            }catch(error) {
+
+                console.log(error)
+                return res.writeHeader(400).end("Erro na sintaxe do Json")
             }
-
-          
-            database.insert("tasks", task)
-
-            return res.writeHeader(201).end()
+           
         }
     },
 
